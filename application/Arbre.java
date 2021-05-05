@@ -10,6 +10,9 @@ public class Arbre {
     private String adresse;
     private double[] localisationGPS = new double[2];
 
+    protected int getCirconference() { return this.circonference; }
+    protected double getHauteur() { return this.hauteur; }
+
     public Arbre(String genre, String espece, String nomCommun, int circonference, double hauteur,
                  String stadeDeveloppement, String adresse, double[] localisationGPS) {
         try {
