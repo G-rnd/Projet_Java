@@ -30,39 +30,12 @@ public class ArbreAssociation {
     }
 
     public void rendreRemarquable(int[] date) {
-        try {
-            StringBuilder error = new StringBuilder();
-            boolean res = true;
-            if (date.length != 3) {
-                error.append("Taille incorrecte");
-                res = false;
-            }
-            if (date[0] <= 0 || date[0] > 31) {
-                if (!res) { error.append(", "); }
-                error.append("Jour incorrect");
-                res = false;
-            }
-            if (date[1] <= 0 || date[1] > 12) {
-                if (!res) { error.append(", "); }
-                error.append("Mois incorrect");
-                res = false;
-            }
-            if (date[2] <= 2020) {
-                if (!res) { error.append(", "); }
-                error.append("Année incorrecte");
-                res = false;
-            }
-            if (res) {
-                this.dateRemarquable = date;
-                this.estRemarquable = true;
-            }
-            else { throw new ExceptionInInitializerError(error.toString()); }
+        if (dateValide.estValide(date)){
+            this.dateRemarquable = date;
+            this.estRemarquable = true;
         }
-        catch (ExceptionInInitializerError e) {
-            StringBuilder sb = new StringBuilder("Erreur : Date saisie incorrecte : ");
-            sb.append(e.toString());
-            sb.append(".");
-            System.out.println(sb.toString());
+        else {
+            System.out.println("L'arbre n'a pas pu être rendu remarquable.");
         }
     }
 
