@@ -1,0 +1,25 @@
+package application;
+
+public class Personne {
+    private String nom;
+    private String prenom;
+    private int[] dateNaissance;
+    private String adresse;
+
+    public Personne(String nom, String prenom, int[] dateNaissance, String adresse) {
+        try {
+            if (dateValide.estValide(dateNaissance)) {
+                this.nom = nom;
+                this.prenom = prenom;
+                this.adresse = adresse;
+                this.dateNaissance = dateNaissance;
+            }
+            else {
+                throw new ExceptionInInitializerError("Date de naissance invalide");
+            }
+        }
+        catch (ExceptionInInitializerError e) {
+            System.out.println(e.toString());
+        }
+    }
+}
