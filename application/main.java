@@ -1,8 +1,8 @@
-package et3.java.projet.application;
+package projet.application;
 
 import java.io.File;
 
-import et3.java.projet.data.FileReader;
+import project.data.FileReader;
 
 public class Main 
 {
