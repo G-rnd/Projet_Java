@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Association {
-    private LinkedList<ArbreAssociation> listeArbres;
-    private LinkedList<Membre> listeMembres;
+    private LinkedList<ArbreAssociation> listeArbres = new LinkedList<ArbreAssociation>();
+    private LinkedList<Membre> listeMembres = new LinkedList<Membre>();
 
     public Association() {
         // ---
@@ -103,6 +103,7 @@ public class Association {
         }
     }
 
+    // todo : savoir si l'arbre est vivant ou pas
     public void voteMembre(Membre m, ArbreAssociation a) {
         if(m.getNbVotes() > 0) {
             if(!a.isEstRemarquable()) {
@@ -118,8 +119,38 @@ public class Association {
         }
     }
 
+    public void rendrePresident(Membre m) {
+        for(int i = 0; i < listeMembres.size(); i++) {
+            if (listeMembres.get(i).equals(m)) {
+                m.setPresident();
+            }
+            else {
+                if (listeMembres.get(i).isPresident()) {
+                    listeMembres.get(i).setPresident(false);
+                }
+            }
+        }
+    }
+
+    // cotisation annuelle d'un membre, vérifie s'il n'a pas déjà payé.
+    public void payer(Membre m, double c) {
+        if (m.isCotisation()) {
+            System.out.print("Payer : le membre a déjà versé sa cotisation annuelle :");
+            System.out.println(m.listeCotisations.getLast());
+        }
+        else {
+            if (c > 0) {
+                m.listeCotisations.add(c);
+                m.setCotisation(true);
+            }
+        }
+    }
+
     public void exclure(Membre m) {
         // TODO avec les CR.
+
+        this.listeMembres.remove(m);
+
         for(int i = 0; i < listeArbres.size(); i++) {
             listeArbres.get(i).masquer(m);
         }
@@ -129,14 +160,41 @@ public class Association {
                 m.listeArbresVotes.get(i).removeNbVotes();
             }
         }
+        // si président
+        if(m.isPresident()) {
+            this.listeMembres.get(0).setPresident();
+        }
 
         // si besoin de retirer autre choses.
         m = null;
     }
 
+    /*
+        TODO pour les visites, l'ancienneté peut être obtenue/changée par getDateDerniereVisite/setDateDerniereVisite
+     */
 
+    /*
+        TODO à la fin de chaque visite, la liste des CR est listeCR dans ArbreAssociation
+     */
+
+    /*
+        TODO le nombre de visites max : (static) nbVisitesMax,
+         les méthodes : setNbVisites, getNbVisites, removeNbVisites
+     */
+
+    /*
+        TODO un objet CR
+         ce serait sympa s'il y avait une méthode toString qui te rédige le cr
+     */
     public static void main(String[] args) {
         boolean ok = true;
+        Personne g = new Personne("NOM", "Prénom", new int[] {5,9,2000},"Ville");
+
+        Association a = new Association();
+        a.inscrire(g, new int[] {6,5,2021}, 25.0);
+        System.out.println(a.listeMembres.size());
+        a.exclure(a.listeMembres.get(0));
+        System.out.println(a.listeMembres.size());
         try ( Scanner scanner = new Scanner( System.in ) ) {
             while(ok) {
                 // affichage interface choix.
