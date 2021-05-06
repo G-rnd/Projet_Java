@@ -32,6 +32,12 @@ public class Membre {
 
     public boolean isCotisation() { return this.cotisation; }
     public void setCotisation(boolean b) { this.cotisation = b; }
+    public void payer(double montant) {
+        if (!this.isCotisation() && montant > 0) {
+            this.setCotisation(true);
+            this.listeCotisations.add(montant);
+        }
+    }
 
     protected void voterArbre(ArbreAssociation a) {
         this.nombreVotes--;
@@ -65,6 +71,8 @@ public class Membre {
         sb.append(this.p.getAdresse());
         sb.append("\nDate d'inscription    : ");
         sb.append(this.getStringDateInscription());
+        sb.append("\nRôle : ");
+        sb.append((this.president) ? "Président" : "Membre");
         sb.append("\nListe des cotisations :\n");
         for(int i = 0; i < this.listeCotisations.size(); i++) {
             sb.append("    ");
