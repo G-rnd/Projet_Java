@@ -237,7 +237,7 @@ public class Association {
                 System.out.println("[Main] Reading the file " + args[0] + " ...");
 
                 //We start by reading the CSV file
-        //      listeArbres = FileReader.getDataFromCSVFile(args[0]);
+                listeArbres = FileReader.getDataFromCSVFile(args[0]);
 
                 System.out.println("[Main] End of the file " + args[0] + ".");
             }
@@ -245,7 +245,7 @@ public class Association {
         }
         else { System.out.println("[Main] You should enter the CSV file path as a parameter."); }
 
-        if(listeArbres == null) {
+        if(listeArbres != null) {
             Association AssociationArbre = new Association();
             // tester des trucs si besoin,
             Application.main(AssociationArbre);
