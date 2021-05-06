@@ -1,6 +1,32 @@
 package application;
 
-public class dateValide {
+public class date {
+    public static int[] stringToDate(String s) {
+        int[] date = new int[3];
+        try {
+            String[] tab = s.split("/");
+            for(int i = 0; i < 3; i++) {
+                date[i] = Integer.parseInt(tab[i]);
+            }
+        }
+        catch (Exception e) {
+        }
+        return date;
+    }
+    public static String dateToString(int[] date) {
+        if (estValide(date)) {
+            return new String(date[0] + "/" + date[1] +"/" + date[2]);
+        }
+        return new String();
+    }
+
+    public static boolean datesEgales(int[] d1, int[] d2) {
+        if (estValide(d1) && estValide(d2)) {
+            return  (d1[0] == d2[0]) && (d1[1] == d2[1]) && (d1[2] == d2[2]);
+        }
+        return false;
+    }
+
     public static boolean estValide(int[] date) {
         try {
             StringBuilder error = new StringBuilder();
