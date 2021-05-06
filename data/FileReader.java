@@ -253,7 +253,7 @@ public class FileReader
                 }
 
                 //TODO Do something with data
-                if (valide && hauteurEnM > 20 && circonferenceEnCm > 200) {
+                if (valide) {
                     listeArbre.add(new Arbre(genre, espece, libelleFrancais, circonferenceEnCm, hauteurEnM, stadeDeveloppement,
                             adresse, new double[]{geographicalPoint2D[0], geographicalPoint2D[1]}, remarquable));
                 }
