@@ -1,5 +1,7 @@
 package data;
 
+import application.Arbre;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -10,11 +12,12 @@ import java.util.List;
 
 public class FileReader
 {
-    public static void getDataFromCSVFile(String csvFilePath)
+    public static ArrayList<Arbre> getDataFromCSVFile(String csvFilePath)
     {
         String line = "";
         String[] data = null;
         String separator = ";(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+        ArrayList<Arbre> listeArbre = new ArrayList<Arbre>();
 
         //Document data
         Integer idBase;
@@ -45,7 +48,7 @@ public class FileReader
             if(data.length != 17)
             {
                 System.out.println("[FileReader] The file at " + csvFilePath + " does not contain the right number of columns.");
-                return;
+                return listeArbre;
             }
 
             int i = 1;
@@ -55,7 +58,7 @@ public class FileReader
             {
                 //Get data from the line
                 data = line.split(separator, -1);
-
+                boolean valide = true;
                 //Sort data
 
                 //Get the base ID
@@ -118,6 +121,7 @@ public class FileReader
                 catch (Exception exception)
                 {
                     adresse = new String();
+                    valide = false;
                 }
 
                 //Get the location ID
@@ -138,6 +142,7 @@ public class FileReader
                 catch (Exception exception)
                 {
                     libelleFrancais = new String();
+                    valide = false;
                 }
 
                 //Get the genus
@@ -148,6 +153,7 @@ public class FileReader
                 catch (Exception exception)
                 {
                     genre = new String();
+                    valide = false;
                 }
 
                 //Get the specie
@@ -158,6 +164,7 @@ public class FileReader
                 catch (Exception exception)
                 {
                     espece = new String();
+                    valide = false;
                 }
 
                 //Get the variety
@@ -178,6 +185,7 @@ public class FileReader
                 catch (Exception exception)
                 {
                     circonferenceEnCm = null;
+                    valide = false;
                 }
 
                 //Get the height (m)
@@ -188,6 +196,7 @@ public class FileReader
                 catch (Exception exception)
                 {
                     hauteurEnM = null;
+                    valide = false;
                 }
 
                 //Get the development state
@@ -227,6 +236,7 @@ public class FileReader
                     catch (Exception exception)
                     {
                         geographicalPoint2D[0] = null;
+                        valide = false;
                     }
                     try
                     {
@@ -235,6 +245,7 @@ public class FileReader
                     catch (Exception exception)
                     {
                         geographicalPoint2D[1] = null;
+                        valide = false;
                     }
                 }
                 catch (Exception exception) {
@@ -242,31 +253,16 @@ public class FileReader
                 }
 
                 //TODO Do something with data
-/*
-                System.out.println(
-                        idBase + ";" +
-                                typeEmplacement + ";" +
-                                domanialite + ";" +
-                                arrondissement + ";" +
-                                complementAdresse + ";" +
-                                adresse + ";" +
-                                idEmplacement + ";" +
-                                libelleFrancais + ";" +
-                                genre + ";" +
-                                espece + ";" +
-                                varieteOuCultivar + ";" +
-                                circonferenceEnCm + ";" +
-                                hauteurEnM + ";" +
-                                stadeDeveloppement + ";" +
-                                remarquable + ";" +
-                                "(" + geographicalPoint2D[0] + "," + geographicalPoint2D[1] + ")");
-                                */
-                System.out.println(idBase);
+                if (valide && hauteurEnM > 20 && circonferenceEnCm > 200) {
+                    listeArbre.add(new Arbre(genre, espece, libelleFrancais, circonferenceEnCm, hauteurEnM, stadeDeveloppement,
+                            adresse, new double[]{geographicalPoint2D[0], geographicalPoint2D[1]}, remarquable));
+                }
             }
         }
         catch (IOException exception)
         {
             System.err.println(exception);
         }
+        return listeArbre;
     }
 }
