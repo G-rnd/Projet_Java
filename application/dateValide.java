@@ -19,7 +19,7 @@ public class dateValide {
                 error.append("Mois incorrect");
                 res = false;
             }
-            if (date[2] <= 2020) {
+            if (date[2] <= 1900) {
                 if (!res) { error.append(", "); }
                 error.append("Année incorrecte");
                 res = false;
