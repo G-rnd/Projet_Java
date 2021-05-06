@@ -1,11 +1,30 @@
 package application;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 public class Association {
     private LinkedList<ArbreAssociation> listeArbres = new LinkedList<ArbreAssociation>();
     private LinkedList<Membre> listeMembres = new LinkedList<Membre>();
+    private int nbMembres = 0;
+
+    protected Membre getMembre(int i) {
+        try {
+            return this.listeMembres.get(i);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+    public int getNbMembres() {
+        return this.nbMembres;
+    }
+    protected void addNbMembre(int n) {
+        if(this.nbMembres + n > 0) {
+            this.nbMembres += n;
+        }
+    }
 
     public Association() {
         // ---
@@ -23,7 +42,7 @@ public class Association {
                     // cherche un arbre non déjà choisi.
                     if (listeProposee.contains(listeArbres.get(i).getArbre())) { continue; }
                     // s'il est déjà remaquable, on ne le comptabilise pas.
-                    if (listeArbres.get(i).isEstRemarquable()) { continue; }
+                    if (listeArbres.get(i).getArbre().isEstRemarquable()) { continue; }
                     else {
                         if (init) {
                             // choix entre deux arbres : le max temporaire et le 1-eme arbre de la liste.
@@ -60,7 +79,7 @@ public class Association {
         }
         else {
             for(int i = 0; i < listeArbres.size(); i++) {
-                if (listeArbres.get(i).isEstRemarquable()) { continue; }
+                if (listeArbres.get(i).getArbre().isEstRemarquable()) { continue; }
                 else {
                     listeProposee.add(listeArbres.get(i).getArbre());
                 }
@@ -71,17 +90,18 @@ public class Association {
 
     public boolean estInscrit(Personne p) {
         for(int i = 0; i < this.listeMembres.size(); i++) {
-            if(this.listeMembres.get(i).getPersonne().equals(p)) { return true;}
+            if(this.listeMembres.get(i).getPersonne().equals(p)) { return true; }
         }
         return false;
     }
 
-    public void inscrire(Personne p, int[] date, double cotisationEntree) {
+    public Membre inscrire(Personne p, int[] date, double cotisationEntree) {
+        Membre m = null;
         StringBuilder error = new StringBuilder("Erreur inscription membre : ");
         boolean res = true;
         try {
             if (this.estInscrit(p)) { throw new ExceptionInInitializerError("Personne déjà inscrite."); }
-            if (dateValide.estValide(date)) {
+            if (application.date.estValide(date)) {
                 if (cotisationEntree < 0) {
                     error.append(", Cotisation d'inscription invalide.");
                     res = false;
@@ -95,18 +115,21 @@ public class Association {
                 }
                 error.append(".");
             }
-            if (res) { this.listeMembres.add(new Membre(p, date, cotisationEntree)); }
+            if (res) {
+                m = new Membre(p, date, cotisationEntree);
+                this.listeMembres.add(m);
+                this.addNbMembre(1);
+            }
             else { throw new ExceptionInInitializerError(error.toString()); }
         }
-        catch (ExceptionInInitializerError e) {
-            System.out.println(e.toString());
-        }
+        catch (ExceptionInInitializerError e) { System.out.println(e.toString()); }
+        return m;
     }
 
     // todo : savoir si l'arbre est vivant ou pas
     public void voteMembre(Membre m, ArbreAssociation a) {
         if(m.getNbVotes() > 0) {
-            if(!a.isEstRemarquable()) {
+            if(!a.getArbre().isEstRemarquable()) {
                 m.listeArbresVotes.add(a);
                 m.voterArbre(a);
             }
@@ -162,7 +185,12 @@ public class Association {
         }
         // si président
         if(m.isPresident()) {
-            this.listeMembres.get(0).setPresident();
+            try {
+                this.listeMembres.get(0).setPresident();
+            }
+            catch (Exception e) {
+                // il n'y a plus de personnes dans l'association...
+            }
         }
 
         // si besoin de retirer autre choses.
@@ -186,26 +214,52 @@ public class Association {
         TODO un objet CR
          ce serait sympa s'il y avait une méthode toString qui te rédige le cr
      */
-    public static void main(String[] args) {
-        boolean ok = true;
-        Personne g = new Personne("NOM", "Prénom", new int[] {5,9,2000},"Ville");
 
-        Association a = new Association();
-        a.inscrire(g, new int[] {6,5,2021}, 25.0);
-        System.out.println(a.listeMembres.size());
-        a.exclure(a.listeMembres.get(0));
-        System.out.println(a.listeMembres.size());
-        try ( Scanner scanner = new Scanner( System.in ) ) {
-            while(ok) {
-                // affichage interface choix.
-                System.out.println( "Veuillez saisir une action.");
-                int res = scanner.nextInt();
+    protected Membre getMembreByPersonne(String nom, String prenom, String dateNaissance, String adresse) {
+        Personne p = new Personne(nom, prenom, date.stringToDate(dateNaissance), adresse);
 
-                System.out.print("lu : ");
-                System.out.println(res);
-                if(res == -1) { ok = false; }
-
+        for(int i = 0; i < this.listeMembres.size(); i++) {
+            if (this.listeMembres.get(i).getPersonne().equals(p)) {
+                return this.listeMembres.get(i);
             }
         }
+        return null;
     }
+
+    public static void main(String[] args) {
+        // techniquement déclarer dans espaces verts
+        ArrayList<Arbre> listeArbres = null;
+        if(args.length > 0)
+        {
+            File tempFile = new File(args[0]);
+            if(tempFile.exists())
+            {
+                System.out.println("[Main] Reading the file " + args[0] + " ...");
+
+                //We start by reading the CSV file
+        //      listeArbres = FileReader.getDataFromCSVFile(args[0]);
+
+                System.out.println("[Main] End of the file " + args[0] + ".");
+            }
+            else { System.out.println("[Main] No file " + args[0]); }
+        }
+        else { System.out.println("[Main] You should enter the CSV file path as a parameter."); }
+
+        if(listeArbres == null) {
+            Association AssociationArbre = new Association();
+            // tester des trucs si besoin,
+            Application.main(AssociationArbre);
+        }
+    }
+
+    /*
+    public static void main(String[] args) {
+        Association asso = new Association();
+        Personne a = new Personne("G","R",dateValide.stringToDate("05/9/2000"), "80 ch rb");
+        Personne b = new Personne("G","R",dateValide.stringToDate("05/09/2000"), "80 ch rb");
+
+        asso.inscrire(a,dateValide.stringToDate("8/8/3021"),25.5);
+        asso.inscrire(b,dateValide.stringToDate("4/8/2021"),2.5);
+    }
+    */
 }
