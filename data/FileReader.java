@@ -69,6 +69,7 @@ public class FileReader
                 catch (Exception exception)
                 {
                     idBase = null;
+                    valide = false;
                 }
 
                 //Get the location type
@@ -254,7 +255,7 @@ public class FileReader
 
                 //TODO Do something with data
                 if (valide) {
-                    listeArbre.add(new Arbre(genre, espece, libelleFrancais, circonferenceEnCm, hauteurEnM, stadeDeveloppement,
+                    listeArbre.add(new Arbre(idBase, genre, espece, libelleFrancais, circonferenceEnCm, hauteurEnM, stadeDeveloppement,
                             adresse, new double[]{geographicalPoint2D[0], geographicalPoint2D[1]}, remarquable));
                 }
             }
