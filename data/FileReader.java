@@ -51,7 +51,7 @@ public class FileReader
                 return listeArbre;
             }
 
-            int i = 1;
+            int i = 0;
 
             //Read the file line by line
             while ((line = bufferedReader.readLine()) != null)
@@ -254,8 +254,9 @@ public class FileReader
                 }
 
                 //TODO Do something with data
-                if (valide) {
-                    listeArbre.add(new Arbre(idBase, genre, espece, libelleFrancais, circonferenceEnCm, hauteurEnM, stadeDeveloppement,
+                if (valide && circonferenceEnCm > 200 && hauteurEnM > 20) {
+                    i++;
+                    listeArbre.add(new Arbre(i, genre, espece, libelleFrancais, circonferenceEnCm, hauteurEnM, stadeDeveloppement,
                             adresse, new double[]{geographicalPoint2D[0], geographicalPoint2D[1]}, remarquable));
                 }
             }
