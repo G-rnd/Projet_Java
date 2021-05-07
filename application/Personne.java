@@ -65,11 +65,4 @@ public class Personne {
             System.out.println(e.toString());
         }
     }
-
-    public static void main(String[] s) {
-        Personne a = new Personne("a","a", date.stringToDate("1/1/2000"), "a");
-        Personne b = new Personne("a","a", date.stringToDate("1/1/2000"), "a");
-
-        System.out.println(a.equals(b));
-    }
 }
