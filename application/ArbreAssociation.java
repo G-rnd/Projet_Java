@@ -42,12 +42,4 @@ public class ArbreAssociation {
     protected void masquer(Membre m) {
 
     }
-
-
-    public static void main(String[] args) {
-        Arbre a1 = new Arbre(1,"bla","bla2","blabla",1,1.1,"grand",
-                "rue", new double[] {1.0,1.0}, true);
-        ArbreAssociation aRem = new ArbreAssociation(a1);
-        aRem.arbre.rendreRemarquable(new int[] {5,9, 2021});
-    }
 }
