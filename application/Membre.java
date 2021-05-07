@@ -1,5 +1,6 @@
 package application;
 
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class Membre {
@@ -7,18 +8,18 @@ public class Membre {
     private boolean president;
     private boolean cotisation;
     private int nbVisites;
+
+    public final int nbVotesMax = 5;
     protected final static int nbVisitesMax = 20;
 
     private int[] dateInscription;
-    // à adapter en LinkedList<Cotisations> si besoin
-    protected LinkedList<Double> listeCotisations = new LinkedList<Double>();
-    protected LinkedList<ArbreAssociation> listeArbresVotes = new LinkedList<ArbreAssociation>();
+    protected LinkedList<ArbreAssociation> listeArbresVotes = new LinkedList<>();
 
-    private int nombreVotes;
+    private int nbVotes;
 
-    public int getNbVisites() { return this.nbVisites; }
+    public int getNbVisitesRestantes() { return this.nbVisites; }
     protected void removeNbVisites() {
-        if (this.getNbVisites() > 0) { this.nbVisites--; }
+        if (this.getNbVisitesRestantes() > 0) { this.nbVisites--; }
     }
     protected void setNbVisites(int n) {
         if(n < nbVisitesMax && n >= 0) { this.nbVisites = n; }
@@ -28,67 +29,157 @@ public class Membre {
     public boolean isPresident() { return  this.president; }
 
     public void setPresident() { this.president = true; }
-    public void setPresident(boolean b) { this.president = b; }
+    public void resetPresident() { this.president = false; }
 
     public boolean isCotisation() { return this.cotisation; }
     public void setCotisation(boolean b) { this.cotisation = b; }
-    public void payer(double montant) {
-        if (!this.isCotisation() && montant > 0) {
+    public boolean payer() {
+        if (this.isCotisation()) {
+            System.out.println("[Membre] : " + this.getPersonne().getPrenom() + " " + this.getPersonne().getNom() + " a déjà payé.");
+            return false;
+        }
+        else {
             this.setCotisation(true);
-            this.listeCotisations.add(montant);
+            return true;
         }
     }
 
     protected void voterArbre(ArbreAssociation a) {
-        this.nombreVotes--;
-        this.listeArbresVotes.add(a);
-        a.addNbVotes();
+        try {
+            if (this != null && a != null) {
+                if (a.getArbre().isEstRemarquable()) {
+                    throw new Exception("Arbre déjà remarquable.");
+                }
+                else {
+                    if(this.listeArbresVotes.contains(a)) {
+                        throw new Exception("Arbre déjà choisi.");
+                    }
+                    else {
+                        if(this.getNbVotesRestants() > 0) {
+                            this.nbVotes--;
+                            System.out.println("[Membre] : Le vote a été pris en compte.");
+                        }
+                        else {
+                            this.listeArbresVotes.getFirst().removeNbVotes();
+                            this.listeArbresVotes.removeFirst();
+                            System.out.println("[Membre] : Le plus ancien choix a été retiré.");
+                        }
+                        this.listeArbresVotes.add(a);
+                        a.addNbVotes();
+                    }
+                }
+            }
+            else {
+                if (this == null) { throw new Exception("Membre introuvable."); }
+                else { throw new Exception("Arbre introuvable;"); }
+            }
+        }
+        catch (Exception e) { System.out.println("[Membre] : Le vote a échoué : " + e.toString()); }
     }
-    protected int getNbVotes() { return this.nombreVotes; }
+    protected void afficherVote() {
+        try {
+            if (this != null) {
+                System.out.println("[Membre] : Liste des Arbres votés par " + this.getPersonne().getNom()
+                        + " " + this.getPersonne().getPrenom() + " :");
+                for(int i = 0; i < this.getNbVotes(); i++) {
+                    System.out.println("    - " + this.listeArbresVotes.get(i).getArbre().getId());
+                }
+                for(int i = 0; i < this.getNbVotesRestants(); i++) {
+                    System.out.println("    - <en attente>");
+                }
+            }
+            else { throw new Exception(); }
+        }
+        catch (Exception e) {
+            System.out.println("[Membre] : Membre introuvable.");
+        }
+    }
+    protected void retirerVoteArbre(int id) {
+        try {
+            if (this != null && id >=0) {
+                boolean res = true;
+                for(int i = 0; i < this.getNbVotes() && res; i++) {
+                    if(this.listeArbresVotes.get(i).getArbre().getId() == id) {
+                        // retire le vote de l'arbre.
+                        this.listeArbresVotes.get(i).removeNbVotes();
+                        // retire le vote de la liste de vote du membre.
+                        this.listeArbresVotes.remove(i);
+
+                        // incrémente le nombre de votes.
+                        this.nbVotes ++;
+                        res = false;
+                    }
+                }
+                System.out.println("Le vote " + ((res) ? "n'a pas " : "a ") + "été retiré.");
+            }
+            else {
+                if (this == null) {
+                    throw new Exception("Membre inexistant");
+                }
+                else { throw new Exception("id incorrect."); }
+            }
+        }
+        catch (Exception e) {
+            System.out.println("[Membre] : Le retrait du vote a échoué : " + e.toString());
+        }
+    }
+    protected void remplacerVoteArbre(Association a, int idAncien, int idNouveau) {
+        try {
+            if (a.getArbreById(idNouveau).getArbre().isEstRemarquable() ||
+                    (idAncien == idNouveau) ||
+                    this.listeArbresVotes.contains(a.getArbreById(idNouveau)) ||
+                    !this.listeArbresVotes.contains(a.getArbreById(idAncien)) ||
+                    (this == null)
+            ) { System.out.println("[Membre] : Le remplacement a échoué."); }
+            else {
+                boolean res = true;
+                for(int i = 0; i < this.listeArbresVotes.size() && res; i++) {
+                    if(this.listeArbresVotes.get(i).getArbre().getId() == idAncien) {
+                        a.getArbreById(idAncien).removeNbVotes();
+                        a.getArbreById(idNouveau).addNbVotes();
+                        Collections.replaceAll(this.listeArbresVotes,a.getArbreById(idAncien), a.getArbreById(idNouveau));
+                        res = false;
+                    }
+                }
+                System.out.println("[Membre] : Le vote " + ((res) ? "n'a pas " : "a ") + "été remplacé.");
+            }
+        }
+        catch (Exception e) { System.out.println("[Membre] : Le remplacement a échoué."); }
+    }
+
+    protected int getNbVotesRestants() { return this.nbVotes; }
+    protected int getNbVotes() { return this.nbVotesMax - this.nbVotes; }
     protected Personne getPersonne() { return this.p; }
 
     public String getStringDateInscription() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.dateInscription[0]);
-        for(int i = 1; i < 3; i ++) {
-            sb.append("/ ");
-            sb.append(this.dateInscription[i]);
-        }
-        return sb.toString();
+        return date.dateToString(this.dateInscription);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("--- Informatiions du membre ---\n");
-        sb.append("Nom                   : ");
-        sb.append(this.p.getNom());
-        sb.append("\nPrénom                : ");
-        sb.append(this.p.getPrenom());
-        sb.append("\nDate de naissance     : ");
-        sb.append(this.p.getStringDateNaissance());
-        sb.append("\nAdresse               :\n    ");
-        sb.append(this.p.getAdresse());
-        sb.append("\nDate d'inscription    : ");
-        sb.append(this.getStringDateInscription());
-        sb.append("\nRôle : ");
-        sb.append((this.president) ? "Président" : "Membre");
-        sb.append("\nListe des cotisations :\n");
-        for(int i = 0; i < this.listeCotisations.size(); i++) {
-            sb.append("    ");
-            sb.append(this.listeCotisations.get(i));
-            sb.append("\n");
-        }
-        return sb.toString();
+        return "--- Informatiions du membre ---\n" +
+               "Nom                   : " +
+               this.p.getNom() +
+               "\nPrénom                : " +
+               this.p.getPrenom() +
+               "\nDate de naissance     : " +
+               this.p.getStringDateNaissance() +
+               "\nAdresse               :\n    " +
+               this.p.getAdresse() +
+               "\n\nDate d'inscription    : " +
+               this.getStringDateInscription() +
+               "\nRôle : " +
+               ((this.president) ? "Président" : "Membre") +
+               "\nPaiement Annuel       : " +
+               ((this.cotisation) ? "Effectué" : "En attente");
     }
 
-    protected Membre(Personne p, int[] dateInscription, double cotisationEntree) {
+    protected Membre(Personne p, int[] dateInscription) {
         this.p = p;
         this.dateInscription = dateInscription;
-        this.listeCotisations.add(cotisationEntree);
         this.cotisation = true;
         this.president = false;
-        this.nombreVotes = 5;
+        this.nbVotes = 5;
         this.nbVisites = 0;
     }
 }
