@@ -16,6 +16,7 @@ public class Arbre {
 
     protected int getCirconference() { return this.circonference; }
     protected double getHauteur() { return this.hauteur; }
+    protected int getId() { return this.id; }
 
     protected boolean isEstRemarquable() { return this.estRemarquable; }
     protected int[] getDateRemarquable() { return this.dateRemarquable.clone(); }
@@ -49,8 +50,5 @@ public class Arbre {
         catch (ExceptionInInitializerError e) {
             System.out.println("Erreur : Localisation incorrecte.");
         }
-    }
-
-    public static void main(String[] args) {
     }
 }
