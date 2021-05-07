@@ -1,13 +1,24 @@
 package application;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Association {
-    private LinkedList<ArbreAssociation> listeArbres = new LinkedList<ArbreAssociation>();
-    private LinkedList<Membre> listeMembres = new LinkedList<Membre>();
+    public final double montantCotisation = 10.5;
     private int nbMembres = 0;
+
+    private ArrayList<Membre> listeMembres = new ArrayList<>();
+    private ArrayList<ArbreAssociation> listeArbres = new ArrayList<>();
+
+
+    public double getMontantCotisation() { return this.montantCotisation; }
+    public int getNbMembres() {
+        return this.nbMembres;
+    }
+
+    protected void addNbMembre(int n) {
+        if(this.nbMembres + n > 0) { this.nbMembres += n; }
+    }
 
     protected Membre getMembre(int i) {
         try {
@@ -17,192 +28,162 @@ public class Association {
             return null;
         }
     }
-    public int getNbMembres() {
-        return this.nbMembres;
-    }
-    protected void addNbMembre(int n) {
-        if(this.nbMembres + n > 0) {
-            this.nbMembres += n;
-        }
-    }
 
-    public Association() {
-        // ---
+    public Association(ArrayList<Arbre> lA) {
+        for (Arbre arbre : lA) {
+            this.listeArbres.add(new ArbreAssociation(arbre));
+        }
     }
 
     public LinkedList<Arbre> proposerListeArbre() {
-        LinkedList<Arbre> listeProposee = new LinkedList<Arbre>();
-        if (this.listeArbres.size() > 5) {
-            int nbArbre = 5;
+        // Liste dans laquelle on range les arbres votés.
+        LinkedList<Arbre> listeProposee = new LinkedList<>();
 
-            ArbreAssociation aMax = new ArbreAssociation(null);
-            boolean init = false;
-            while (nbArbre != 0) {
-                for(int i = 0; i < listeArbres.size(); i++) {
+        ArbreAssociation aMax = null;
+        int nbArbre = 5;
+        boolean init = true;
+        boolean ok = false;
+
+        // tant que l'on a pas choisi 5 arbres et que l'on a pas parcouru toute la liste sans en choisir un nouveau.
+        while (nbArbre != 0 && !ok) {
+            ok = true;
+
+            for (ArbreAssociation aa : listeArbres) {
                     // cherche un arbre non déjà choisi.
-                    if (listeProposee.contains(listeArbres.get(i).getArbre())) { continue; }
+                if (!(listeProposee.contains(aa.getArbre()) ||
+                    // s'il n'a pas été voté, on ne le compte pas.
+                    aa.getNbVotes() == 0 ||
                     // s'il est déjà remaquable, on ne le comptabilise pas.
-                    if (listeArbres.get(i).getArbre().isEstRemarquable()) { continue; }
-                    else {
-                        if (init) {
-                            // choix entre deux arbres : le max temporaire et le 1-eme arbre de la liste.
-                            ArbreAssociation aTemp = listeArbres.get(i);
-                            // test du nombre de votes
-                            if (aTemp.getNbVotes() > aMax.getNbVotes()) { aMax = aTemp; }
-                            else {
-                                // si nombre de votes est égal, on passe à la circonférence
-                                if (aTemp.getNbVotes() == aMax.getNbVotes()) {
-                                    if (aTemp.getArbre().getCirconference() > aMax.getArbre().getCirconference()) {
-                                        aMax = aTemp;
-                                    }
-                                    // si nbVotes et circonférence sont égaux, on passe à la hauteur
-                                    else {
-                                        if(aTemp.getArbre().getCirconference() == aMax.getArbre().getCirconference()) {
-                                            if(aTemp.getArbre().getHauteur() > aMax.getArbre().getHauteur()) {
-                                                aMax = aTemp;
-                                            }
+                    aa.getArbre().isEstRemarquable()
+                )) {
+                    if (!init) {
+                        // choix entre deux arbres : le max temporaire et le i-eme arbre de la liste.
+                        // test du nombre de votes
+                        if (aa.getNbVotes() > aMax.getNbVotes()) {
+                            aMax = aa;
+                            ok = false;
+                        } else {
+                            // si nombre de votes est égal, on passe à la circonférence
+                            if (aa.getNbVotes() == aMax.getNbVotes()) {
+                                if (aa.getArbre().getCirconference() > aMax.getArbre().getCirconference()) {
+                                    aMax = aa;
+                                    ok = false;
+                                }
+                                // si nbVotes et circonférence sont égaux, on passe à la hauteur
+                                else {
+                                    if (aa.getArbre().getCirconference() == aMax.getArbre().getCirconference()) {
+                                        if (aa.getArbre().getHauteur() > aMax.getArbre().getHauteur()) {
+                                            aMax = aa;
+                                            ok = false;
                                         }
                                     }
-
                                 }
                             }
                         }
-                        else {
-                            aMax = listeArbres.get(i);
-                            init = true;
-                        }
+                    }
+                    else {
+                        // 1er arbre de la boucle détecté.
+
+                        aMax = aa;
+                        init = false;
+                        ok = false;
                     }
                 }
-                // à la fin, on a l'arbre à ajouter dans aMax
-                listeProposee.add(aMax.getArbre());
             }
-        }
-        else {
-            for(int i = 0; i < listeArbres.size(); i++) {
-                if (listeArbres.get(i).getArbre().isEstRemarquable()) { continue; }
-                else {
-                    listeProposee.add(listeArbres.get(i).getArbre());
-                }
+            if (!ok) {
+                // à la fin, on a l'arbre à ajouter dans aMax si on a trouvé un Arbre.
+                listeProposee.add(aMax.getArbre());
+                aMax = null;
+                init = true;
+                nbArbre--;
             }
         }
         return listeProposee;
     }
 
     public boolean estInscrit(Personne p) {
-        for(int i = 0; i < this.listeMembres.size(); i++) {
-            if(this.listeMembres.get(i).getPersonne().equals(p)) { return true; }
+        for (Membre listeMembre : this.listeMembres) {
+            if (listeMembre.getPersonne().equals(p)) {
+                return true;
+            }
         }
         return false;
     }
 
-    public Membre inscrire(Personne p, int[] date, double cotisationEntree) {
+    public Membre inscrire(Personne p, int[] date) {
         Membre m = null;
-        StringBuilder error = new StringBuilder("Erreur inscription membre : ");
-        boolean res = true;
         try {
-            if (this.estInscrit(p)) { throw new ExceptionInInitializerError("Personne déjà inscrite."); }
-            if (application.date.estValide(date)) {
-                if (cotisationEntree < 0) {
-                    error.append(", Cotisation d'inscription invalide.");
-                    res = false;
-                }
+            if (this.estInscrit(p)) {
+                throw new Exception("La personne est déjà inscrite.");
             }
             else {
-                res = false;
-                error.append("Date invalide");
-                if (cotisationEntree <= 0) {
-                    error.append(", Cotisation d'inscription invalide");
+                if (application.date.estValide(date)) {
+                    m = new Membre(p, date);
+                    if (this.getNbMembres() == 0) { m.setPresident(); }
+                    this.addNbMembre(1);
+                    this.listeMembres.add(m);
                 }
-                error.append(".");
             }
-            if (res) {
-                m = new Membre(p, date, cotisationEntree);
-                this.listeMembres.add(m);
-                this.addNbMembre(1);
-            }
-            else { throw new ExceptionInInitializerError(error.toString()); }
         }
-        catch (ExceptionInInitializerError e) { System.out.println(e.toString()); }
+        catch (Exception e) { System.out.println("[Association] : L'inscription a échouée : "+ e.toString()); }
         return m;
     }
-
-    // todo : savoir si l'arbre est vivant ou pas
-    public void voteMembre(Membre m, ArbreAssociation a) {
-        if(m.getNbVotes() > 0) {
-            if(!a.getArbre().isEstRemarquable()) {
-                m.listeArbresVotes.add(a);
-                m.voterArbre(a);
-            }
-            else { System.out.println("Vote : arbre déjà remarquable."); }
-        }
-        else {
-            m.listeArbresVotes.remove(0);
-            m.listeArbresVotes.add(a);
-            System.out.println("Vote : Le plus ancien choix a été retiré.");
-        }
-    }
-
-    public void rendrePresident(Membre m) {
-        for(int i = 0; i < listeMembres.size(); i++) {
-            if (listeMembres.get(i).equals(m)) {
-                m.setPresident();
-            }
+    public void desinscriptionMembre(Membre m) {
+        try {
+            if (m == null) { throw new Exception("Membre inexistant."); }
             else {
-                if (listeMembres.get(i).isPresident()) {
-                    listeMembres.get(i).setPresident(false);
+                if (this.listeMembres.contains(m)) {
+                    this.listeMembres.remove(m);
+                    this.addNbMembre(-1);
+
+                    // TODO avec les CR.
+                    /*
+                    for (int i = 0; i < listeArbres.size(); i++) {
+                        listeArbres.get(i).masquer(m);
+                    }
+                     */
+
+                    // retirer les votes
+                    if (m.getNbVotesRestants() < m.nbVotesMax) {
+                        for (int i = 0; i < m.listeArbresVotes.size(); i++) {
+                            m.listeArbresVotes.get(i).removeNbVotes();
+                        }
+                    }
+
+                    // si président
+                    if (m.isPresident()) {
+                        try {
+                            this.listeMembres.get(0).setPresident();
+                        } catch (Exception e) {
+                            // il n'y a plus de personnes dans l'association...
+                        }
+                    }
+
+                    // si besoin de retirer autre choses.
+
+                } else {
+                    // normalement impossible
+                    throw new Exception("Membre inexistant.");
                 }
             }
         }
+        catch (Exception e) { System.out.println("[Association] : La désinscription a échoué : " + e.toString()); }
     }
 
-    // cotisation annuelle d'un membre, vérifie s'il n'a pas déjà payé.
-    public void payer(Membre m, double c) {
-        if (m.isCotisation()) {
-            System.out.print("Payer : le membre a déjà versé sa cotisation annuelle :");
-            System.out.println(m.listeCotisations.getLast());
-        }
-        else {
-            if (c > 0) {
-                m.listeCotisations.add(c);
-                m.setCotisation(true);
-            }
+    public void nommerPresident(Membre m) {
+        if (m != null && !m.equals(this.getActualPresident())) {
+            this.getActualPresident().resetPresident();
+            m.setPresident();
         }
     }
 
-    public void exclure(Membre m) {
-        // TODO avec les CR.
-
-        this.listeMembres.remove(m);
-
-        for(int i = 0; i < listeArbres.size(); i++) {
-            listeArbres.get(i).masquer(m);
-        }
-        // retirer les votes
-        if(m.getNbVotes() < 5) {
-            for(int i = 0; i < m.listeArbresVotes.size(); i++) {
-                m.listeArbresVotes.get(i).removeNbVotes();
-            }
-        }
-        // si président
-        if(m.isPresident()) {
-            try {
-                this.listeMembres.get(0).setPresident();
-            }
-            catch (Exception e) {
-                // il n'y a plus de personnes dans l'association...
-            }
-        }
-
-        // si besoin de retirer autre choses.
-        m = null;
-    }
 
     /*
         TODO pour les visites, l'ancienneté peut être obtenue/changée par getDateDerniereVisite/setDateDerniereVisite
      */
 
     /*
-        TODO à la fin de chaque visite, la liste des CR est listeCR dans ArbreAssociation
+        TODO à la fin de chaque visite, la liste des CR est listeCR dans ArbreAssociation + dans le membre qui a fait la visite
      */
 
     /*
@@ -212,54 +193,53 @@ public class Association {
 
     /*
         TODO un objet CR
-         ce serait sympa s'il y avait une méthode toString qui te rédige le cr
+         + ce serait sympa s'il y avait une méthode toString qui te rédige le cr
      */
+
+    // todo : savoir si l'arbre est vivant ou pas -> le retirer de la liste des AA.
 
     protected Membre getMembreByPersonne(String nom, String prenom, String dateNaissance, String adresse) {
         Personne p = new Personne(nom, prenom, date.stringToDate(dateNaissance), adresse);
 
-        for(int i = 0; i < this.listeMembres.size(); i++) {
-            if (this.listeMembres.get(i).getPersonne().equals(p)) {
+        for (Membre listeMembre : this.listeMembres) {
+            if (listeMembre.getPersonne().equals(p)) {
+                return listeMembre;
+            }
+        }
+        return null;
+    }
+    protected ArbreAssociation getArbreById(int id) {
+        for (ArbreAssociation listeArbre : this.listeArbres) {
+            if (listeArbre.getArbre().getId() == id) {
+                return listeArbre;
+            }
+        }
+        return null;
+    }
+
+    public void afficherArbreAssociation() {
+        if (this.listeArbres.size() > 0) {
+            System.out.println("[Association] : Affichage de la liste d'id des Arbres.");
+            for (ArbreAssociation listeArbre : this.listeArbres) {
+                System.out.println(listeArbre.getArbre().getId());
+            }
+        }
+        else { System.out.println("[Association] : La liste des arbres est vide."); }
+    }
+
+    protected Membre getActualPresident() {
+        for(int i = 0; i < this.nbMembres; i++) {
+            if (this.listeMembres.get(i).isPresident()) {
                 return this.listeMembres.get(i);
             }
         }
         return null;
     }
 
-    public static void main(String[] args) {
-        // techniquement déclarer dans espaces verts
-        ArrayList<Arbre> listeArbres = null;
-        if(args.length > 0)
-        {
-            File tempFile = new File(args[0]);
-            if(tempFile.exists())
-            {
-                System.out.println("[Main] Reading the file " + args[0] + " ...");
-
-                //We start by reading the CSV file
-                listeArbres = FileReader.getDataFromCSVFile(args[0]);
-
-                System.out.println("[Main] End of the file " + args[0] + ".");
-            }
-            else { System.out.println("[Main] No file " + args[0]); }
-        }
-        else { System.out.println("[Main] You should enter the CSV file path as a parameter."); }
-
-        if(listeArbres != null) {
-            Association AssociationArbre = new Association();
-            // tester des trucs si besoin,
-            Application.main(AssociationArbre);
+    public void afficherMembres() {
+        System.out.println("[Association] : Liste des " + this.getNbMembres() + " membre(s) de l'association.");
+        for(int i = 0; i < this.getNbMembres(); i++) {
+            System.out.println(this.getMembre(i).toString());
         }
     }
-
-    /*
-    public static void main(String[] args) {
-        Association asso = new Association();
-        Personne a = new Personne("G","R",dateValide.stringToDate("05/9/2000"), "80 ch rb");
-        Personne b = new Personne("G","R",dateValide.stringToDate("05/09/2000"), "80 ch rb");
-
-        asso.inscrire(a,dateValide.stringToDate("8/8/3021"),25.5);
-        asso.inscrire(b,dateValide.stringToDate("4/8/2021"),2.5);
-    }
-    */
 }
