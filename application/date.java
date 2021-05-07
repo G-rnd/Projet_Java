@@ -9,15 +9,14 @@ public class date {
                 date[i] = Integer.parseInt(tab[i]);
             }
         }
-        catch (Exception e) {
-        }
+        catch (Exception ignored) {}
         return date;
     }
     public static String dateToString(int[] date) {
         if (estValide(date)) {
-            return new String(date[0] + "/" + date[1] +"/" + date[2]);
+            return date[0] + "/" + date[1] + "/" + date[2];
         }
-        return new String();
+        return "";
     }
 
     public static boolean datesEgales(int[] d1, int[] d2) {
@@ -54,10 +53,7 @@ public class date {
             else { return true; }
         }
         catch (ExceptionInInitializerError e) {
-            StringBuilder sb = new StringBuilder("Erreur : Date saisie incorrecte : ");
-            sb.append(e.toString());
-            sb.append(".");
-            System.out.println(sb.toString());
+            System.out.println("Erreur : Date saisie incorrecte : " + e.toString() + ".");
             return false;
         }
     }
