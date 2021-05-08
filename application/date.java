@@ -1,6 +1,14 @@
 package application;
 
+/**
+ * Date.
+ */
 public class date {
+    /**
+     * Renvoie un tableau d'entiers à partir d'une chaîne de caractères.
+     * @param s Une chaîne de caractères dont la date associée est au format DD/MM/AAAA.
+     * @return Un tableau contenant le jour, le mois et l'année si la date est valide, un tableau vide de taille 3 sinon.
+     */
     public static int[] stringToDate(String s) {
         int[] date = new int[3];
         try {
@@ -12,6 +20,12 @@ public class date {
         catch (Exception ignored) {}
         return date;
     }
+
+    /**
+     * Renvoie une chaîne de caractères à partir d'un tableau d'entiers.
+     * @param date Un tableau contenant le jour, le mois et l'année de la date considéréeL
+     * @return Une chaîne de caractère comportant une date au format DD/MM/AAAA si elle est valide, vide sinon.
+     */
     public static String dateToString(int[] date) {
         if (estValide(date)) {
             return date[0] + "/" + date[1] + "/" + date[2];
@@ -19,6 +33,12 @@ public class date {
         return "";
     }
 
+    /**
+     * Permet de savoir si deux dates sont égales.
+     * @param d1 Un tableau d'entiers comportant la première date.
+     * @param d2 Un tableau d'entiers comportant la seconde date.
+     * @return Un booléen à VRAI si les dates sont les mêmes, à FAUX sinon.
+     */
     public static boolean datesEgales(int[] d1, int[] d2) {
         if (estValide(d1) && estValide(d2)) {
             return  (d1[0] == d2[0]) && (d1[1] == d2[1]) && (d1[2] == d2[2]);
@@ -26,6 +46,12 @@ public class date {
         return false;
     }
 
+    // TODO peut être faire le truc des mois à 30/31 et fév 28/29
+    /**
+     * Permet de savoir si une date est valide.
+     * @param date Un tableau d'entiers comportant la date considérée.
+     * @return Un booléen à VRAI si la date existe, à FAUX sinon.
+     */
     public static boolean estValide(int[] date) {
         try {
             StringBuilder error = new StringBuilder();
