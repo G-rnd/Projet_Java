@@ -146,6 +146,11 @@ public class Membre {
         }
         catch (Exception e) { System.out.println("[Membre] : Le remplacement a échoué."); }
     }
+    protected void resetVote() {
+        while(this.listeArbresVotes.size() > 0) {
+            this.retirerVoteArbre(this.listeArbresVotes.getFirst().getArbre().getId());
+        }
+    }
 
     protected int getNbVotesRestants() { return this.nbVotes; }
     protected int getNbVotes() { return this.nbVotesMax - this.nbVotes; }
