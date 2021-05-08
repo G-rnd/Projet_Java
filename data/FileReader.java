@@ -8,35 +8,29 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 
 public class FileReader
 {
     public static ArrayList<Arbre> getDataFromCSVFile(String csvFilePath)
     {
-        String line = "";
-        String[] data = null;
+        String line;
+        String[] data;
         String separator = ";(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
-        ArrayList<Arbre> listeArbre = new ArrayList<Arbre>();
+        ArrayList<Arbre> listeArbre = new ArrayList<>();
 
         //Document data
         Integer idBase;
-        String typeEmplacement;
-        String domanialite;
-        String arrondissement;
-        String complementAdresse;
         String adresse;
-        Integer idEmplacement;
         String libelleFrancais;
         String genre;
         String espece;
-        String varieteOuCultivar;
         Integer circonferenceEnCm;
         Integer hauteurEnM;
         String stadeDeveloppement;
         Boolean remarquable;
         Float[] geographicalPoint2D = new Float[2];
 
+        boolean valide = true;
         try (BufferedReader bufferedReader = Files.newBufferedReader(Paths.get(csvFilePath), StandardCharsets.ISO_8859_1))
         {
             //Read the first line
@@ -51,16 +45,15 @@ public class FileReader
                 return listeArbre;
             }
 
-            int i = 0;
-
             //Read the file line by line
             while ((line = bufferedReader.readLine()) != null)
             {
                 //Get data from the line
                 data = line.split(separator, -1);
-                boolean valide = true;
                 //Sort data
 
+
+                valide = true;
                 //Get the base ID
                 try
                 {
@@ -72,48 +65,6 @@ public class FileReader
                     valide = false;
                 }
 
-                //Get the location type
-                try
-                {
-                    typeEmplacement = data[1];
-                }
-                catch (Exception exception)
-                {
-                    typeEmplacement = new String();
-                }
-
-                //Get the domain
-                try
-                {
-                    domanialite = data[2];
-                }
-                catch (Exception exception)
-                {
-                    domanialite = new String();
-                }
-
-                //Get the district
-                try
-                {
-                    arrondissement = data[3];
-                }
-                catch (Exception exception)
-                {
-                    arrondissement = new String();
-                }
-
-                //Get the complementary address
-                try
-                {
-                    complementAdresse = data[4];
-                }
-                catch (Exception exception)
-                {
-                    complementAdresse = new String();
-                }
-
-                //data[5] is the number
-
                 //Get the address
                 try
                 {
@@ -121,18 +72,8 @@ public class FileReader
                 }
                 catch (Exception exception)
                 {
-                    adresse = new String();
+                    adresse = "";
                     valide = false;
-                }
-
-                //Get the location ID
-                try
-                {
-                    idEmplacement = Integer.parseInt(data[7]);
-                }
-                catch (Exception exception)
-                {
-                    idEmplacement = null;
                 }
 
                 //Get the French name
@@ -142,7 +83,7 @@ public class FileReader
                 }
                 catch (Exception exception)
                 {
-                    libelleFrancais = new String();
+                    libelleFrancais = "";
                     valide = false;
                 }
 
@@ -153,7 +94,7 @@ public class FileReader
                 }
                 catch (Exception exception)
                 {
-                    genre = new String();
+                    genre = "";
                     valide = false;
                 }
 
@@ -164,18 +105,8 @@ public class FileReader
                 }
                 catch (Exception exception)
                 {
-                    espece = new String();
+                    espece = "";
                     valide = false;
-                }
-
-                //Get the variety
-                try
-                {
-                    varieteOuCultivar = data[11];
-                }
-                catch (Exception exception)
-                {
-                    varieteOuCultivar = new String();
                 }
 
                 //Get the circumference (cm)
@@ -207,23 +138,18 @@ public class FileReader
                 }
                 catch (Exception exception)
                 {
-                    stadeDeveloppement = new String();
+                    stadeDeveloppement = "";
+                    valide = false;
                 }
 
                 //Get whether the tree is remarquable or not
                 try {
-                    if(data[15].equals("OUI") || data[15].equals("oui"))
-                    {
-                        remarquable = true;
-                    }
-                    else
-                    {
-                        remarquable = false;
-                    }
+                    remarquable = data[15].equals("OUI") || data[15].equals("oui");
                 }
                 catch (Exception exception)
                 {
                     remarquable = false;
+                    valide = false;
                 }
 
                 //Get the geographical point
@@ -251,12 +177,12 @@ public class FileReader
                 }
                 catch (Exception exception) {
                     geographicalPoint2D = new Float[]{null, null};
+                    valide = false;
                 }
 
                 //TODO Do something with data
-                if (valide && circonferenceEnCm > 200 && hauteurEnM > 20) {
-                    i++;
-                    listeArbre.add(new Arbre(i, genre, espece, libelleFrancais, circonferenceEnCm, hauteurEnM, stadeDeveloppement,
+                if (valide) {
+                    listeArbre.add(new Arbre(idBase, genre, espece, libelleFrancais, circonferenceEnCm, hauteurEnM, stadeDeveloppement,
                             adresse, new double[]{geographicalPoint2D[0], geographicalPoint2D[1]}, remarquable));
                 }
             }
