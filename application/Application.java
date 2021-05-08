@@ -13,7 +13,8 @@ public class Application {
                 "  Actions vote Arbres d'un Membre :\n" +
                 "    ( 5) : Voter pour un Arbre\n" +
                 "    ( 6) : Afficher liste des votes\n" +
-                "    ( 8) : Retirer un vote\n" +
+                "    ( 7) : Retirer un vote\n" +
+                "    ( 8) : Supprimer les votes d'un Membre.\n" +
                 "    ( 9) : Remplacer un vote\n" +
                 "  Actions Arbres :\n" +
                 "    (10) : Afficher la liste des Arbres\n" +
@@ -50,10 +51,16 @@ public class Application {
                 Application.retirerVoteArbre(a, scanner);
                 break;
             case 8:
-                Application.remplacerVoteArbre(a, scanner);
+                Application.resetVoteArbre(a, scanner);
                 break;
             case 9:
+                Application.remplacerVoteArbre(a, scanner);
+                break;
+            case 10:
                 Application.afficherArbresAssociation(a);
+                break;
+            case 11:
+                Application.nommerPresident(a, scanner);
                 break;
             default:
                 System.out.println("[Application] : Action non reconnue.");
@@ -193,7 +200,14 @@ public class Application {
             System.out.println("[Application] : Le changement de vote a échoué ...");
         }
     }
-
+    public static void resetVoteArbre(Association a, Scanner scanner) {
+        try {
+            getMembreByScanner(a, scanner).resetVote();
+        }
+        catch (Exception e) {
+            System.out.println("[Application] : La suppression des votes a échoué ...");
+        }
+    }
     public static void nommerPresident(Association a, Scanner scanner) {
         try {
             a.nommerPresident(getMembreByScanner(a, scanner));
