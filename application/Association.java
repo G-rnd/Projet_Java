@@ -3,23 +3,44 @@ package application;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+/**
+ * Association.
+ */
 public class Association {
+    // Attributs.
     public final double montantCotisation = 10.5;
     private int nbMembres = 0;
 
     private ArrayList<Membre> listeMembres = new ArrayList<>();
     private ArrayList<ArbreAssociation> listeArbres = new ArrayList<>();
 
+    // Méthodes.
 
+    /**
+     * Renvoie le montant de la cotisation annuelle de l'association.
+     * @return L'attribut montantCotisation de l'association.
+     */
     public double getMontantCotisation() { return this.montantCotisation; }
-    public int getNbMembres() {
-        return this.nbMembres;
-    }
 
+    /**
+     * Renvoie le nombre de membres de l'association.
+     * @return L'attribut nbMembres de l'association.
+     */
+    public int getNbMembres() { return this.nbMembres; }
+
+    /**
+     * Ajoute le nombre passé en paramètre au nombre de membres.
+     * @param n L'entier à ajouter au nombre de membres.
+     */
     protected void addNbMembre(int n) {
         if(this.nbMembres + n > 0) { this.nbMembres += n; }
     }
 
+    /**
+     * Renvoie le i-ème membre de la liste des membres de l'association.
+     * @param i L'indice du membre considéré.
+     * @return Le membre s'il existe, null sinon.
+     */
     protected Membre getMembre(int i) {
         try {
             return this.listeMembres.get(i);
@@ -29,12 +50,10 @@ public class Association {
         }
     }
 
-    public Association(ArrayList<Arbre> lA) {
-        for (Arbre arbre : lA) {
-            this.listeArbres.add(new ArbreAssociation(arbre));
-        }
-    }
-
+    /**
+     * Renvoie un classement d'arbres candidats à la classification en tant qu'arbres remarquables.
+     * @return Une liste d'arbres de taille au plus 5.
+     */
     public LinkedList<Arbre> proposerListeArbre() {
         // Liste dans laquelle on range les arbres votés.
         LinkedList<Arbre> listeProposee = new LinkedList<>();
@@ -54,7 +73,7 @@ public class Association {
                     // s'il n'a pas été voté, on ne le compte pas.
                     aa.getNbVotes() == 0 ||
                     // s'il est déjà remaquable, on ne le comptabilise pas.
-                    aa.getArbre().isEstRemarquable()
+                    aa.getArbre().getEstRemarquable()
                 )) {
                     if (!init) {
                         // choix entre deux arbres : le max temporaire et le i-eme arbre de la liste.
@@ -101,6 +120,11 @@ public class Association {
         return listeProposee;
     }
 
+    /**
+     * Permet de savoir si une personne est inscrite à l'association.
+     * @param p La personne considérée.
+     * @return Un booléen à VRAI si la personne est inscrite, à FAUX sinon.
+     */
     public boolean estInscrit(Personne p) {
         for (Membre listeMembre : this.listeMembres) {
             if (listeMembre.getPersonne().equals(p)) {
@@ -110,6 +134,12 @@ public class Association {
         return false;
     }
 
+    /**
+     * Permet d'inscrire une personne à une date choisi.
+     * @param p La personne considérée.
+     * @param date la date considérée.
+     * @return Le membre s'il est inscrit, null sinon.
+     */
     public Membre inscrire(Personne p, int[] date) {
         Membre m = null;
         try {
@@ -128,6 +158,11 @@ public class Association {
         catch (Exception e) { System.out.println("[Association] : L'inscription a échouée : "+ e.toString()); }
         return m;
     }
+
+    /**
+     * Permet de désinscrire un membre.
+     * @param m Le membre considéré.
+     */
     public void desinscriptionMembre(Membre m) {
         try {
             if (m == null) { throw new Exception("Membre inexistant."); }
@@ -170,6 +205,10 @@ public class Association {
         catch (Exception e) { System.out.println("[Association] : La désinscription a échoué : " + e.toString()); }
     }
 
+    /**
+     * Permet de nommer un nouveau président d'association.
+     * @param m Le futur président de l'association.
+     */
     public void nommerPresident(Membre m) {
         if (m != null && !m.equals(this.getActualPresident())) {
             this.getActualPresident().resetPresident();
@@ -196,37 +235,58 @@ public class Association {
          + ce serait sympa s'il y avait une méthode toString qui te rédige le cr
      */
 
-    // todo : savoir si l'arbre est vivant ou pas -> le retirer de la liste des AA.
+    // todo : savoir si l'arbre est vivant ou pas -> le retirer de la liste des AA. (à appeler à chaque notification).
 
+    /**
+     * Renvoie le membre associé aux attributs d'une personne.
+     * @param nom Le nom de la personne.
+     * @param prenom Le prénom de la personne.
+     * @param dateNaissance La date de naissance de la personne au format DD/MM/AAAA.
+     * @param adresse L'adresse de la personne.
+     * @return Le membre si existant, null sinon.
+     */
     protected Membre getMembreByPersonne(String nom, String prenom, String dateNaissance, String adresse) {
         Personne p = new Personne(nom, prenom, date.stringToDate(dateNaissance), adresse);
 
-        for (Membre listeMembre : this.listeMembres) {
-            if (listeMembre.getPersonne().equals(p)) {
-                return listeMembre;
-            }
-        }
-        return null;
-    }
-    protected ArbreAssociation getArbreById(int id) {
-        for (ArbreAssociation listeArbre : this.listeArbres) {
-            if (listeArbre.getArbre().getId() == id) {
-                return listeArbre;
+        for (Membre m : this.listeMembres) {
+            if (m.getPersonne().equals(p)) {
+                return m;
             }
         }
         return null;
     }
 
+    /**
+     * Renvoie l'arbre de l'association dont l'arbre associé possède l'id passé en paramètre.
+     * @param id L'id de l'arbre considéré.
+     * @return L'arbre de l'association s'il existe, null sinon.
+     */
+    protected ArbreAssociation getArbreById(int id) {
+        for (ArbreAssociation aa : this.listeArbres) {
+            if (aa.getArbre().getId() == id) {
+                return aa;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Affiche la liste des ids des arbres de l'association.
+     */
     public void afficherArbreAssociation() {
         if (this.listeArbres.size() > 0) {
             System.out.println("[Association] : Affichage de la liste d'id des Arbres.");
-            for (ArbreAssociation listeArbre : this.listeArbres) {
-                System.out.println(listeArbre.getArbre().getId());
+            for (ArbreAssociation aa : this.listeArbres) {
+                System.out.println("  " + aa.getArbre().getId());
             }
         }
         else { System.out.println("[Association] : La liste des arbres est vide."); }
     }
 
+    /**
+     * Renvoie le président de l'association.
+     * @return Le membre dont l'attribut président est à VRAI, null si inexistant.
+     */
     protected Membre getActualPresident() {
         for(int i = 0; i < this.nbMembres; i++) {
             if (this.listeMembres.get(i).isPresident()) {
@@ -236,10 +296,26 @@ public class Association {
         return null;
     }
 
+    /**
+     * Affiche la liste des informations des membres de l'association.
+     */
     public void afficherMembres() {
         System.out.println("[Association] : Liste des " + this.getNbMembres() + " membre(s) de l'association.");
         for(int i = 0; i < this.getNbMembres(); i++) {
             System.out.println(this.getMembre(i).toString());
+        }
+    }
+
+    // Constructeur
+
+    /**
+     * Initialise une association avec la liste des arbres de la ville.
+     * @param lA Une liste d'arbres.
+     */
+    public Association(ArrayList<Arbre> lA) {
+        for (Arbre arbre : lA) {
+            // todo mettre ici les critères.
+            this.listeArbres.add(new ArbreAssociation(arbre));
         }
     }
 }
