@@ -5,8 +5,17 @@ import data.FileReader;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * Main.
+ */
 public class Main
 {
+    /**
+     * Fonction Principale du projet.
+     * @param args La liste des arguments : [0]: La source du fichier csv.
+     *                                      [1]: Affiche le test avec l'argument test.
+     *                                      [2]: Affiche seulement le test avec l'argument only.
+     */
     public static void main(String[] args) {
         // techniquement déclarer dans espaces verts
         ArrayList<Arbre> listeArbres = null;
