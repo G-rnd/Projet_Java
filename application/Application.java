@@ -2,7 +2,14 @@ package application;
 
 import java.util.Scanner;
 
+/**
+ * Interface textuelle.
+ */
 public class Application {
+
+    /**
+     * Affiche le menu de l'application.
+     */
     public static void afficherMenu() {
         System.out.println("\n## Menu de l'application ##\n" +
                 "  Actions Membres :\n"+
@@ -25,6 +32,15 @@ public class Application {
                 "\n    ( 0) : Quitter l'application\n" +
                 " - Veuillez saisir une action. -");
     }
+
+    /**
+     * Lance l'action saisie au clavier.
+     * @param nb L'id de l'action à affectuer.
+     * @param a L'association associée.
+     * @param scanner
+     * @return Un booléen pour interrompre l'application ou non.
+     *
+     */
     public static boolean action(int nb, Association a, Scanner scanner) {
         switch (nb) {
             case 0:
@@ -68,6 +84,13 @@ public class Application {
         }
         return true;
     }
+
+    /**
+     * Renvoie un membre de l'association s'il existe.
+     * @param a L'association associée.
+     * @param scanner
+     * @return Le membre de l'association si existant, null sinon.
+     */
     public static Membre getMembreByScanner(Association a, Scanner scanner) {
         try {
             System.out.println("Saisir le nom de la personne.");
@@ -87,6 +110,12 @@ public class Application {
 
     // -*- Méthodes obligatoires.
     // 1. Inscription d’un nouveau membre et désinscription d’un membre existant.
+
+    /**
+     * Lance l'action inscription.
+     * @param a L'association associée.
+     * @param scanner
+     */
     public static void inscriptionMembre(Association a, Scanner scanner) {
         try {
             System.out.println("Saisir le nom de la personne.");
@@ -112,6 +141,12 @@ public class Application {
             System.out.println("[Application] : L'ajout d'un nouveau membre a échoué ...");
         }
     }
+
+    /**
+     * Lance l'action disinscription.
+     * @param a L'association associée.
+     * @param scanner
+     */
     public static void desinscriptionMembre(Association a, Scanner scanner) {
         try {
             a.desinscriptionMembre(getMembreByScanner(a, scanner));
@@ -122,6 +157,12 @@ public class Application {
     }
 
     // 2. Recette de la cotisation d’un membre.
+
+    /**
+     * Lance l'action payer
+     * @param a L'association associée.
+     * @param scanner
+     */
     public static void payerCotisation(Association a, Scanner scanner) {
         try {
             if (getMembreByScanner(a, scanner).payer()) {
@@ -142,6 +183,12 @@ public class Application {
     //    une visite programmée.
 
     // 6. Vote d’un membre en faveur de la reconnaissance d’un arbre remarquable.
+
+    /**
+     * Lance l'action voter en faveur de la reconnaissance d'un arbre remarquable.
+     * @param a L'association associée.
+     * @param scanner
+     */
     public static void ajouterVoteArbre(Association a, Scanner scanner) {
         try {
             Membre m = getMembreByScanner(a, scanner);
@@ -157,14 +204,28 @@ public class Application {
     //    arbre remarquable.
 
     // -*- Méthodes facultatives.
+
+    /**
+     * Affiche la liste des informations des membres.
+     * @param a L'association associée.
+     */
     public static void afficherMembres(Association a) {
         a.afficherMembres();
     }
 
+    /**
+     * Affiche la liste des id des arbres de l'association.
+     * @param a L'association associée.
+     */
     public static void afficherArbresAssociation(Association a) {
         a.afficherArbreAssociation();
     }
 
+    /**
+     * Affiche la liste des votes d'un membre de l'association.
+     * @param a L'association associée.
+     * @param scanner
+     */
     public static void afficherVoteArbreListe(Association a, Scanner scanner) {
         try {
             getMembreByScanner(a, scanner).afficherVote();
@@ -173,6 +234,12 @@ public class Application {
             System.out.println("[Application] : L'affichage des votes du membre a échoué ...");
         }
     }
+
+    /**
+     * Lance l'action retirer un vote d'un membre.
+     * @param a L'association associée.
+     * @param scanner
+     */
     public static void retirerVoteArbre(Association a, Scanner scanner) {
         try {
             Membre m = getMembreByScanner(a, scanner);
@@ -186,6 +253,12 @@ public class Application {
             System.out.println("[Application] : Le retrait du vote a échoué ...");
         }
     }
+
+    /**
+     * Lance l'action remplacer un vote d'un membre.
+     * @param a L'association associée.
+     * @param scanner
+     */
     public static void remplacerVoteArbre(Association a, Scanner scanner) {
         try {
             Membre m = getMembreByScanner(a, scanner);
@@ -200,6 +273,12 @@ public class Application {
             System.out.println("[Application] : Le changement de vote a échoué ...");
         }
     }
+
+    /**
+     * Lance l'action effacer la liste des votes d'un membre.
+     * @param a L'association associée.
+     * @param scanner
+     */
     public static void resetVoteArbre(Association a, Scanner scanner) {
         try {
             getMembreByScanner(a, scanner).resetVote();
@@ -208,6 +287,12 @@ public class Application {
             System.out.println("[Application] : La suppression des votes a échoué ...");
         }
     }
+
+    /**
+     * Lance l'action nommer un nouveau président de l'association.
+     * @param a L'association associée.
+     * @param scanner
+     */
     public static void nommerPresident(Association a, Scanner scanner) {
         try {
             a.nommerPresident(getMembreByScanner(a, scanner));
@@ -217,6 +302,10 @@ public class Application {
         }
     }
 
+    /**
+     * Programme principal.
+     * @param a L'association associée.
+     */
     public static void main(Association a) {
         System.out.println("\n--*-- Début de l'application --*--\n  Les actions [] sont les contraintes");
         System.out.println("## Association d'amateurs d'arbres ##");
